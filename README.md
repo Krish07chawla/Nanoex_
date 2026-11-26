@@ -34,7 +34,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](https://nanoex.onrender.com) and log in as the admin from your `.env`
+Open https://nanoex.onrender.com and log in as the admin from your `.env`
 (default `admin@nanoex.in`; set your own password in `.env`).
 
 No database server is needed: SQLite is used by default.
