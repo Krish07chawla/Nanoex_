@@ -5,8 +5,12 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app import config
 
-# Some hosts give "postgres://..." but SQLAlchemy wants "postgresql://..."
-url = config.DATABASE_URL.replace("postgres://", "postgresql://", 1)
+# Some hosts give "postgres://..." or "postgresql://...". We always use the
+# psycopg (version 3) driver, so we say so explicitly in the address.
+url = config.DATABASE_URL
+for prefix in ("postgres://", "postgresql://"):
+    if url.startswith(prefix):
+        url = "postgresql+psycopg://" + url[len(prefix):]
 connect_args = {"check_same_thread": False} if url.startswith("sqlite") else {}
 
 engine = create_engine(url, connect_args=connect_args)
