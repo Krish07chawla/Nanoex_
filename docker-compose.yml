@@ -1,0 +1,35 @@
+# Run everything on your own computer:   docker compose up --build
+# Then open http://localhost:8000
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: nanoex
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nanoex-local}
+      POSTGRES_DB: nanoex
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nanoex"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://nanoex:${POSTGRES_PASSWORD:-nanoex-local}@db:5432/nanoex
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in a .env file next to this file}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@nanoex.in}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in a .env file next to this file}
+      MARKET_PROVIDER: ${MARKET_PROVIDER:-yahoo}
+      XAI_API_KEY: ${XAI_API_KEY:-}
+      XAI_MODEL: ${XAI_MODEL:-grok-4}
+
+volumes:
+  dbdata:
